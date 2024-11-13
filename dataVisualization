@@ -1,0 +1,56 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv('~/textcode/output.csv')
+print(df.head())
+df.columns = df.columns.str.strip()
+print(df.columns)
+
+
+df['40-Yard'] = df['40-Yard'].fillna(df['40-Yard'].median())
+df['Bench Press'] = df['Bench Press'].fillna(df['Bench Press'].median())
+df['Wonderlic'] = df['Wonderlic'].fillna(df['Wonderlic'].median())
+df['Vert-Leap-(in)'] = df['Vert-Leap-(in)'].fillna(df['Vert-Leap-(in)'].median())
+df['Broad-Jump-(in)'] = df['Broad-Jump-(in)'].fillna(df['Broad-Jump-(in)'].median())
+df['Shuttle'] = df['Shuttle'].fillna(df['Shuttle'].median())
+df['3Cone'] = df['3Cone'].fillna(df['3Cone'].median())
+
+df['40-Yard'] = pd.to_numeric(df['40-Yard'], errors='coerce')  
+df['Bench Press'] = pd.to_numeric(df['Bench Press'], errors='coerce')
+df['Wonderlic'] = pd.to_numeric(df['Wonderlic'], errors='coerce') 
+df['Vert-Leap-(in)'] = pd.to_numeric(df['Vert-Leap-(in)'], errors='coerce') 
+df['Broad-Jump-(in)'] = pd.to_numeric(df['Broad-Jump-(in)'], errors='coerce') 
+df['Shuttle'] = pd.to_numeric(df['Shuttle'], errors='coerce') 
+df['3Cone'] = pd.to_numeric(df['3Cone'], errors='coerce') 
+df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
+df['FantPt'] = pd.to_numeric(df['FantPt'], errors='coerce')
+
+
+year_data = df[df['Year'] == 2005]
+
+top_td_players = year_data.sort_values(by='TD', ascending=False).head(10)
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x='TD', y='Player', data=top_td_players, palette='viridis', hue=None)
+plt.title('Top 10 Players with Most Touchdowns in 2005')
+plt.xlabel('Touchdowns (TD)')
+plt.ylabel('Player')
+plt.show()
+    
+rb_data = df[df['FantPos'] == 'RB']
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='40-Yard', y='TD', data=rb_data, hue='Player', palette='coolwarm', s=100, legend=None)
+plt.title('40 Yard Time vs. Touchdowns for Running Backs')
+plt.xlabel('40 Yard Time (seconds)')
+plt.ylabel('Touchdowns (TD)')
+plt.show()
+
+qb_data = df[df['FantPos'] == 'QB']
+qb_trend = qb_data.groupby('Year')['FantPt'].sum().reset_index()
+plt.figure(figsize=(10, 6))
+sns.lineplot(x='Year', y='FantPt', data=qb_trend, marker='o', color='b')
+plt.title('Trend of Total Fantasy Points for Quarterbacks Over the Years')
+plt.xlabel('Year')
+plt.ylabel('Total Fantasy Points (FantPt)')
+plt.show()
